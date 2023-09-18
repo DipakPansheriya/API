@@ -8,5 +8,6 @@ route.put('/upadteUser', userController.upadteUser )
 route.delete('/deleteUser', userController.DeleteUser )
 route.post('/loginUser', userController.loginUser )
 route.post('/protected', userController.protected )
+route.post('/sendMailOTP', userController.sendMailOTP )
 
 module.exports = route

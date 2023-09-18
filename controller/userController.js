@@ -8,11 +8,11 @@ exports.createUser = async (req, res) => {
     try {
         const user = new registerListchema({
             email: req.body.email,
-            contactNumber : req.body.contactNumber,
+            contactNumber: req.body.contactNumber,
             userName: req.body.userName,
             password: req.body.password
         })
-        console.log("==user====",user);
+        console.log("==user====", user);
         await user.save()
         return res.status(200).json({ data: user, message: "user created successful" });
     } catch (error) {
@@ -54,42 +54,86 @@ exports.getUser = async (req, res) => {
     }
 }
 
-exports.loginUser = async  (req, res) => {
+exports.loginUser = async (req, res) => {
     const { userName, password } = req.body;
-    
+
     // Check if username and password are valid (this is a basic example, use a proper authentication mechanism)
-    const user = await registerListchema.findOne({userName});
+    const user = await registerListchema.findOne({ userName });
     if (user.userName === userName && user.password === password) {
 
-        const token = jwt.sign({ userId: user._id, username: user.userName }, secretKey , { expiresIn: '24h' });
-    // Generate a JWT token
-    const userData = {
-        userName : user.userName,
-        token : token,
-        userId : user._id
-    }
-    res.status(200).json({ data: userData , message: "user login successful" });
+        const token = jwt.sign({ userId: user._id, username: user.userName }, secretKey, { expiresIn: '24h' });
+        // Generate a JWT token
+        const userData = {
+            userName: user.userName,
+            token: token,
+            userId: user._id
+        }
+        res.status(200).json({ data: userData, message: "user login successful" });
     } else {
         return res.status(401).json({ message: 'Invalid credentials' });
     }
 };
 
-exports.protected = async  (req, res) => {
- 
+exports.protected = async (req, res) => {
+
     const token = req.headers.authorization;
-  
+
     if (!token) {
-      return res.status(401).json({ message: 'Token not provided' });
+        return res.status(401).json({ message: 'Token not provided' });
     }
-  
+
     // Verify the JWT token
     jwt.verify(token, secretKey, (error, decoded) => {
-      if (error) {
-        return res.status(401).json({ message: 'Invalid token' });
-      }
-  
-      // Token is valid
-      res.json({ message: 'Protected route accessed', user: decoded });
+        if (error) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        // Token is valid
+        res.json({ message: 'Protected route accessed', user: decoded });
 
     });
 };
+
+exports.sendMailOTP = async (req, res) => {
+    try {
+        const user = new registerListchema({
+            email: req.body.email,
+        })
+        // Nodemailer configuration
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail', // Use your email service provider
+            auth: {
+                user: 'pansheriyadipak210@gmail.com', // Your email address
+                pass: 'Demo@123' // Your email password
+            }
+        });
+
+        const mailOptions = {
+            from: 'pansheriyadipak210@gmail.com',
+            to: req.body.email, // The recipient's email address
+            subject: 'Hello from Node.js and Express.js',
+            text: 'This is a test email sent from a Node.js application with Express.js and Nodemailer.'
+          };
+        
+
+        // Send the email
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error(error);
+                res.status(500).send('Error sending email');
+            } else {
+                console.log('Email sent: ' + info.response);
+                res.send('Email sent successfully');
+            }
+        });
+
+
+
+        console.log("==user====", user);
+        await user.save()
+        return res.status(200).json({ data: user, message: "user created successful" });
+    } catch (error) {
+        res.send(error)
+
+    }
+}
