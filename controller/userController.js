@@ -1,6 +1,7 @@
 
 const registerListchema = require('../schema/userschema')
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 let secretKey = "sjhgsjgfssghjxcxzcvvsadsjghdwywgdjsxnbzcxcxzcvsahgdshdwydghjdsxzncvxmxcnnxcnxcnsdfgdjsfgewufdshvbfxcnvbcsdhfgeliefdsf"
 
@@ -12,7 +13,6 @@ exports.createUser = async (req, res) => {
             userName: req.body.userName,
             password: req.body.password
         })
-        console.log("==user====", user);
         await user.save()
         return res.status(200).json({ data: user, message: "user created successful" });
     } catch (error) {
@@ -96,44 +96,52 @@ exports.protected = async (req, res) => {
 
 exports.sendMailOTP = async (req, res) => {
     try {
-        const user = new registerListchema({
-            email: req.body.email,
-        })
-        // Nodemailer configuration
+        const generateOTP = () => {
+            // Generate a 6-digit OTP
+            return Math.floor(100000 + Math.random() * 900000);
+          }; 
+
         const transporter = nodemailer.createTransport({
-            service: 'Gmail', // Use your email service provider
+            host: 'smtp.ethereal.email',
+            port: 587,
             auth: {
-                user: 'pansheriyadipak210@gmail.com', // Your email address
-                pass: 'Demo@123' // Your email password
+                user: 'luciano.emmerich0@ethereal.email',
+                pass: 'J4nHUgDnmvpWWMXrNV'
             }
         });
-
+        const otp = generateOTP();
+        const userData = await registerListchema.findOneAndUpdate({ email : req.body.email} , {otp : otp})
         const mailOptions = {
-            from: 'pansheriyadipak210@gmail.com',
-            to: req.body.email, // The recipient's email address
-            subject: 'Hello from Node.js and Express.js',
-            text: 'This is a test email sent from a Node.js application with Express.js and Nodemailer.'
+            from: 'luciano.emmerich0@ethereal.email',
+            to: req.body.email,
+            subject: 'Your OTP Code',
+            text: `Your OTP code is: ${otp}`
           };
-        
 
-        // Send the email
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.error(error);
-                res.status(500).send('Error sending email');
+                    res.status(500).send('Error sending email');
             } else {
-                console.log('Email sent: ' + info.response);
-                res.send('Email sent successfully');
+                res.status(200).json({ email: req.body.email, message: "Resignation email send otp successfully" });
             }
         });
-
-
-
-        console.log("==user====", user);
-        await user.save()
-        return res.status(200).json({ data: user, message: "user created successful" });
+       
     } catch (error) {
         res.send(error)
 
+    }
+}
+
+exports.forgotPassword = async (req,res) => {
+    try {
+        const userData = await registerListchema.findOne({ email : req.body.email})
+        if (userData.otp === req.body.otp) {
+            const userData12 = await registerListchema.findOneAndUpdate({ email : userData.email} , {password : req.body.newPassword})
+        res.status(200).json({message: "New Password change successfully" });
+        } else {
+        res.send({ message : "Invalid code received for user"})
+        }
+    } catch (error) {
+        res.send(error)
     }
 }

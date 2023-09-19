@@ -19,6 +19,10 @@ const registerData = new db.Schema(
         type: Number,
         required: true,
       },
+      otp: {
+        type: Number,
+        required: false,
+      },
     },
 
   );
