@@ -58,19 +58,23 @@ exports.loginUser = async (req, res) => {
     const { userName, password } = req.body;
 
     // Check if username and password are valid (this is a basic example, use a proper authentication mechanism)
-    const user = await registerListchema.findOne({ userName });
-    if (user.userName === userName && user.password === password) {
-
-        const token = jwt.sign({ userId: user._id, username: user.userName }, secretKey, { expiresIn: '24h' });
-        // Generate a JWT token
-        const userData = {
-            userName: user.userName,
-            token: token,
-            userId: user._id
-        }
-        res.status(200).json({ data: userData, message: "user login successful" });
+    const user = await registerListchema.findOne({ userName : userName });
+    if (!user) {
+        res.status(401).json({ message: 'Invalid user credentials' });
     } else {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        if (user.userName === userName && user.password === password) {
+    
+            const token = jwt.sign({ userId: user._id, username: user.userName }, secretKey, { expiresIn: '24h' });
+            // Generate a JWT token
+            const userData = {
+                userName: user.userName,
+                token: token,
+                userId: user._id
+            }
+            res.status(200).json({ data: userData, message: "user login successful" });
+        } else {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
     }
 };
 
