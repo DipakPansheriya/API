@@ -114,7 +114,7 @@ exports.sendMailOTP = async (req, res) => {
         const mailOptions = {
             from: 'luciano.emmerich0@ethereal.email',
             to: req.body.email,
-            subject: 'Your OTP Code',
+            subject: ` ${req.body.email} Your Email Code`,
             text: `Your OTP code is: ${otp}`
           };
 
