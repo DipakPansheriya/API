@@ -1,5 +1,6 @@
 const express = require('express');
 const userRoute =  require('./router/userRoute')
+const studentsRoute =  require('./router/studentsRoute')
 require('./db/connection')
 
 const app = express();
@@ -18,7 +19,7 @@ app.use(function(req, res, next) {
   
 app.use(express.json());
 app.use('/api/v1/user' , userRoute)
-
+app.use('/api/v1', studentsRoute)
 
 
 app.listen(PORT, () => {
