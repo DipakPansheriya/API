@@ -25,6 +25,14 @@ const studentslist = new db.Schema(
             type: String,
             required: true,
         },
+        std: {
+            type: Number,
+            required: true,
+        },
+        students_free : {
+            type: Number,
+            required: true,
+        },
     },
 
 );

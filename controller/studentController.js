@@ -18,6 +18,8 @@ exports.createStudent = async (req, res) => {
             middle_name: req.body.middle_name,
             last_name: req.body.last_name,
             date_of_birth: req.body.date_of_birth,
+            std: req.body.std,
+            students_free : req.body.students_free ,
             userId : loginuser._id
         })
         await user.save()
@@ -34,7 +36,9 @@ exports.upadteStudent = async (req, res) => {
             first_name: req.body.first_name,
             middle_name: req.body.middle_name,
             last_name: req.body.last_name,
-            date_of_birth: req.body.date_of_birth
+            date_of_birth: req.body.date_of_birth,
+            std: req.body.std,
+            students_free : req.body.students_free ,
         })
         res.status(200).json({ data: allUser, message: "Student update successful" });
     } catch (error) {
